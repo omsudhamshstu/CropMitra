@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropMitra Contact</title>
+    <link rel="stylesheet" href="contact.css">
+    <link rel="icon" type="image/jpg" href="leaf.png">
+</head>
+<body>
+    <div class="container">
+        <h1>Greetings, <span id="usernameDisplay"></span>!</h1>
+        <p>Email: <a href="mailto:23h51a66dp@cmrcet.ac.in">23h51a66dp@cmrcet.ac.in</a></p>
+        <footer>&copy; CropMitra_SIP11 Ltd</footer>
+    </div>
+
+    <script>
+        document.getElementById('usernameDisplay').innerText = localStorage.getItem('username');
+    </script>
+</body>
+</html>

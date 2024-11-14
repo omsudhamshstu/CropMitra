@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CropMitra - Dashboard</title>
+    <link rel="icon" type="image/jpg" href="leaf.png">
+    <link rel="stylesheet" href="index.html">
+    <link rel="stylesheet" href="dashboars.css">
+    <script>
+        async function fetchSensorData() {
+            try {
+                const humidityResponse = await fetch("http://192.168.220.168/humidity");
+                const temperatureResponse = await fetch("http://192.168.220.168/temperature");
+                const moistureResponse = await fetch("http://192.168.220.168/moisture");
+                const valveStatusResponse = await fetch("http://192.168.220.168/valve");
+
+                const humidity = await humidityResponse.text();
+                const temperature = await temperatureResponse.text();
+                const moisture = await moistureResponse.text();
+                const valveStatus = await valveStatusResponse.text();
+
+                document.getElementById("humidity").innerText = humidity + "%";
+                document.getElementById("temperature").innerText = temperature + "°C";
+                document.getElementById("moisture").innerText = moisture + " (Optimal)";
+                document.getElementById("valveStatus").innerText = valveStatus === "1" ? "ON" : "OFF";
+
+                // Set the toggle state based on the valve status
+                document.getElementById("valveToggle").checked = valveStatus === "1";
+            } catch (error) {
+                console.error("Error fetching sensor data:", error);
+            }
+        }
+
+        function loadUserData() {
+            const username = localStorage.getItem("username") || "@user";
+            const location = localStorage.getItem("location") || "Unknown Location";
+            document.getElementById("username").innerText = username;
+            document.getElementById("location").innerText = location;
+
+            fetchSensorData();
+        }
+
+        window.onload = loadUserData;
+
+        function toggleValve() {
+            const isChecked = document.getElementById("valveToggle").checked;
+            console.log("Valve is now " + (isChecked ? "ON" : "OFF"));
+            document.getElementById("valveStatus").innerText = isChecked ? "ON" : "OFF";
+        }
+    </script>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>CropMitra <span class="leaf">🌿</span></h1>
+            <nav>
+                <a href="#">Home</a>
+                <a href="contact.html">Contact</a>
+                <span class="user-icon">👤</span>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <div class="greeting">
+            <p>Greetings, <span id="username">@user</span>! | 📍 <span id="location">currentLocation</span></p>
+        </div>
+        <div class="sensor-container">
+            <div class="sensor-box">
+                <h3>Humidity</h3>
+                <p id="humidity">--%</p>
+            </div>
+            <div class="sensor-box">
+                <h3>Temperature</h3>
+                <p id="temperature">--°C</p>
+            </div>
+            <div class="sensor-box">
+                <h3>Moisture Content</h3>
+                <p id="moisture">-- Optimal</p>
+            </div>
+            <div class="sensor-box">
+                <h3>Valve Status</h3>
+                <p id="valveStatus">OFF</p>
+                <div class="toggle-container">
+                    <label class="switch">
+                        <input type="checkbox" id="valveToggle" onchange="toggleValve()">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <p>©CropMitra_SIP11 Ltd</p>
+    </footer>
+</body>
+</html>

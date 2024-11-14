@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CropMitra - Sign In</title>
+  <link rel="icon" type="image/jpg" href="leaf.png">
+  <link rel="stylesheet" href="index.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <div class="container">
+    <div class="left-section">
+      <h1>CropMitra <span class="leaf">🌿</span></h1>
+      <p>Empowering Farmers with <span class="highlight">Real-Time Data</span> and Smart Irrigation</p>
+    </div>
+    <div class="right-section">
+      <h2>Sign in</h2>
+      <form onsubmit="event.preventDefault(); initiateLogin();">
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="text" id="location" placeholder="Location" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <input type="text" id="mobile" placeholder="Mobile Number" required pattern="[0-9]{10}" title="Enter a 10-digit mobile number">
+        
+        <button type="button" onclick="initiateLogin()">Sign in</button>
+
+        <div id="otp-section" style="display: none;">
+          <input type="text" id="otp" placeholder="Enter OTP" required pattern="[0-9]{6}" title="Enter the 6-digit OTP">
+          <button type="button" onclick="verifyOtp()">Verify OTP</button>
+        </div>
+
+        <div class="links">
+          <a href="#">Forget password? <span>Reset</span></a>
+          <a href="#">Don't have an account? <span>Sign up</span></a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    async function initiateLogin() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const mobile = document.getElementById("mobile").value;
+
+      if (username && password && mobile) {
+        try {
+          const response = await fetch('http://localhost:3000/login', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, password, mobile })
+          });
+
+          const data = await response.json();
+
+          if (response.ok && data.message === 'OTP required for first-time login') {
+            document.getElementById("otp-section").style.display = "block";
+            alert(`OTP sent to your mobile number: ${data.generatedOtp}`);
+          } else if (response.ok && data.message === 'Login successful, OTP not required') {
+            alert(data.message);
+            localStorage.setItem('token', data.token);
+            window.location.href = "dashboard.html";
+          } else {
+            alert(data.message);
+          }
+        } catch (error) {
+          console.error("Login error:", error);
+          alert("An error occurred. Please try again.");
+        }
+      } else {
+        alert("Please fill in all fields.");
+      }
+    }
+
+    async function verifyOtp() {
+      const username = document.getElementById("username").value;
+      const otp = document.getElementById("otp").value;
+
+      if (otp) {
+        try {
+          const response = await fetch('http://localhost:3000/verify-otp', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username, otp })
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            alert("OTP verified successfully! Login successful.");
+            localStorage.setItem('token', data.token);
+            window.location.href = "dashboard.html";
+          } else {
+            alert(data.message);
+          }
+        } catch (error) {
+          console.error("OTP verification error:", error);
+          alert("An error occurred. Please try again.");
+        }
+      } else {
+        alert("Please enter the OTP.");
+      }
+    }
+  </script>
+</body>
+</html>
